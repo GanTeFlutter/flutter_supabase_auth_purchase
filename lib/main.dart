@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_supabase_google_odeme/future/home/home_view.dart';
 import 'package:flutter_supabase_google_odeme/product/init/app_initialize.dart';
 import 'package:flutter_supabase_google_odeme/product/init/state_initialize.dart';
 import 'package:flutter_supabase_google_odeme/product/theme/app_dark_theme.dart';
