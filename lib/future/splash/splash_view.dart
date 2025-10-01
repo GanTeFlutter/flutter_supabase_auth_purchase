@@ -17,9 +17,7 @@ class _SplashViewState extends State<SplashView> {
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 10,
           children: [
-            ElevatedButton(onPressed: () {}, child: Text('SplashView')),
-            ElevatedButton(onPressed: () {}, child: Text('SplashView')),
-            ElevatedButton(onPressed: () {}, child: Text('SplashView')),
+          
             Text('SplashView'),
           ],
         ),

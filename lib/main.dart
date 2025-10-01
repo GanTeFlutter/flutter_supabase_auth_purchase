@@ -6,12 +6,15 @@ import 'package:flutter_supabase_google_odeme/product/theme/app_dark_theme.dart'
 import 'package:flutter_supabase_google_odeme/product/theme/app_light_theme.dart';
 import 'package:flutter_supabase_google_odeme/future/splash/splash_view.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 part 'product/navigation/app_gorouter.dart';
 
 Future<void> main() async {
   await AppInitialize().make();
+  
   runApp(const StateInitialize(child: _MyApp()));
 }
+final supabase = Supabase.instance.client;
 
 class _MyApp extends StatelessWidget {
   const _MyApp();
