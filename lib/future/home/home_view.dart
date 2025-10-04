@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_supabase_google_odeme/product/service/service_locator.dart';
-
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -10,14 +8,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  //
-
-  void fetchUsers(String userId) async {
-    final user = await locator.supabase.getUser(userId);
-    locator.logger.i('Kullanıcı: $user');
-  }
-
-  @override 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('HomeView')),
@@ -26,18 +17,8 @@ class _HomeViewState extends State<HomeView> {
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 10,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                fetchUsers('1a9b515f-dba0-2628-1f34-3ffa047fc789');
-              },
-              child: Text('HomeView'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                debugPrint('.....................................');
-              },
-              child: Text('HomeView'),
-            ),
+            ElevatedButton(onPressed: () {}, child: Text('HomeView')),
+            ElevatedButton(onPressed: () {}, child: Text('HomeView')),
             ElevatedButton(onPressed: () {}, child: Text('HomeView')),
             Text('HomeView'),
           ],

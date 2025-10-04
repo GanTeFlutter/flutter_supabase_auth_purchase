@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter_supabase_google_odeme/product/service/service_locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService {
@@ -14,7 +15,7 @@ class SupabaseService {
       final response = await query;
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      print('Hata (getUsers): $e');
+      locator.logger.e('Kullanıcılar getirilemedi', error: e);
       return [];
     }
   }
@@ -29,7 +30,7 @@ class SupabaseService {
           .single();
       return response;
     } catch (e) {
-      print('Hata (getUser): $e');
+      locator.logger.e('Kullanıcı getirilemedi: $userId', error: e);
       return null;
     }
   }
@@ -49,9 +50,9 @@ class SupabaseService {
             ? DateTime.now().toIso8601String()
             : null,
       });
-      print('Kullanıcı eklendi: $email');
+      locator.logger.i('Kullanıcı eklendi: $email');
     } catch (e) {
-      print('Hata (addUser): $e');
+      locator.logger.e('Kullanıcı eklenemedi: $email', error: e);
     }
   }
 
@@ -66,9 +67,9 @@ class SupabaseService {
   Future<void> deleteUser(String userId) async {
     try {
       await _client.from('users').delete().eq('id', userId);
-      print('Kullanıcı silindi: $userId');
+      locator.logger.i('Kullanıcı silindi: $userId');
     } catch (e) {
-      print('Hata (deleteUser): $e');
+      locator.logger.e('Kullanıcı silinemedi: $userId', error: e);
     }
   }
 
@@ -82,7 +83,7 @@ class SupabaseService {
           .single();
       return response['is_premium'] ?? false;
     } catch (e) {
-      print('Hata (isUserPremium): $e');
+      locator.logger.e('Premium durumu kontrol edilemedi: $userId', error: e);
       return false;
     }
   }
@@ -97,9 +98,9 @@ class SupabaseService {
             'premium_last_date': DateTime.now().toIso8601String(),
           })
           .eq('id', userId);
-      print('Kullanıcı premium yapıldı!');
+      locator.logger.i('Kullanıcı premium yapıldı: $userId');
     } catch (e) {
-      print('Hata (markUserPremium): $e');
+      locator.logger.e('Kullanıcı premium yapılamadı: $userId', error: e);
     }
   }
 
@@ -110,9 +111,9 @@ class SupabaseService {
           .from('users')
           .update({'is_premium': false, 'premium_last_date': null})
           .eq('id', userId);
-      print('Kullanıcı premium kaldırıldı!');
+      locator.logger.i('Premium kaldırıldı: $userId');
     } catch (e) {
-      print('Hata (removePremium): $e');
+      locator.logger.e('Premium kaldırılamadı: $userId', error: e);
     }
   }
 
@@ -120,9 +121,9 @@ class SupabaseService {
   Future<void> clearUsers() async {
     try {
       await _client.from('users').delete().neq('id', ''); // tüm satırları siler
-      print('Tüm kullanıcılar silindi!');
+      locator.logger.w('Tüm kullanıcılar silindi!');
     } catch (e) {
-      print('Hata (clearUsers): $e');
+      locator.logger.e('Kullanıcılar silinemedi', error: e);
     }
   }
 

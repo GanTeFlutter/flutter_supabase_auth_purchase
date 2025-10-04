@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_supabase_google_odeme/future/auth/login_page.dart';
+import 'package:flutter_supabase_google_odeme/main.dart';
 import 'package:flutter_supabase_google_odeme/product/extension/show_snackbar.dart';
-import 'package:flutter_supabase_google_odeme/product/init/app_initialize.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AccountPage extends StatefulWidget {
@@ -91,9 +91,8 @@ class _AccountPageState extends State<AccountPage> {
       }
     } finally {
       if (mounted) {
-        Navigator.of(
-          context,
-        ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginPage()));
+        context.goNamed('LoginPage');
+      
       }
     }
   }

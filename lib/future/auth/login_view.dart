@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_supabase_google_odeme/main.dart';
 import 'package:flutter_supabase_google_odeme/product/extension/show_snackbar.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,8 +17,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _redirecting = false;
+
   late final TextEditingController _emailController = TextEditingController();
   late final StreamSubscription<AuthState> _authStateSubscription;
+
   Future<void> _signIn() async {
     try {
       setState(() {
@@ -59,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
           _redirecting = true;
           if (mounted) {
             context.showSnackBar('Successfully signed in!');
-            Navigator.pushReplacementNamed(context, '/home');
+            context.goNamed('HomeView');
           }
         }
       },

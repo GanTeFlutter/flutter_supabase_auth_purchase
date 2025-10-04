@@ -1,5 +1,5 @@
 import 'package:flutter_supabase_google_odeme/product/service/services/logger_service.dart';
-import 'package:flutter_supabase_google_odeme/product/service/services/supabase_service.dart';
+import 'package:flutter_supabase_google_odeme/product/service/services/supabase_table_service.dart';
 import 'package:get_it/get_it.dart';
 
 final GetIt locator = GetIt.instance;
