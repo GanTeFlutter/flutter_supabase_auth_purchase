@@ -14,6 +14,12 @@ final class _HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
           },
           icon: Icon(Icons.person_2_outlined),
         ),
+        IconButton(
+          onPressed: () {
+            context.goNamed('PurchaseView');
+          },
+          icon: Icon(Icons.shopping_cart_outlined),
+        ),
       ],
     );
   }

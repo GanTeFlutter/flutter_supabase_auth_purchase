@@ -29,6 +29,14 @@ final GoRouter _router = GoRouter(
             return const AccountView();
           },
         ),
+
+        GoRoute(
+          name: 'PurchaseView',
+          path: '/purchaseview',
+          builder: (BuildContext context, GoRouterState state) {
+            return const PurchaseView();
+          },
+        ),
       ],
     ),
   ],

@@ -12,7 +12,7 @@ class _LoginViewState extends State<LoginView> with LoginViewMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign In')),
+      appBar: AppBar(title: const Text('Sign In / version: 1.0.1+2')),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
         children: [
