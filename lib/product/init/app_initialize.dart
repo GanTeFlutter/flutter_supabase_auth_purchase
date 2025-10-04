@@ -5,7 +5,6 @@ import 'package:flutter_supabase_google_odeme/product/config/env_dev.dart';
 import 'package:flutter_supabase_google_odeme/product/service/service_locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 @immutable
 final class AppInitialize {
   Future<void> make() async {
@@ -14,9 +13,7 @@ final class AppInitialize {
       url: EnvDev.supabaseUrl,
       anonKey: EnvDev.supabaseAnonKey,
     );
-    
     setupLocator();
-    
   }
 }
 

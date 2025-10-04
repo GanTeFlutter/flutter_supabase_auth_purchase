@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_supabase_google_odeme/product/service/service_locator.dart';
 
-import 'package:flutter_supabase_google_odeme/product/state/cubit/auth_cubit.dart';
+import 'package:flutter_supabase_google_odeme/product/state/cubit/splash_auth_cubit.dart';
 import 'package:go_router/go_router.dart';
 
 class SplashView extends StatefulWidget {
@@ -16,25 +16,25 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    context.read<AuthCubit>().checkAuthStatus();
+    context.read<SplashAuthCubit>().checkAuthStatus();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthCubit, AuthState>(
+    return BlocBuilder<SplashAuthCubit, SplashAuthState>(
       builder: (context, state) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (state is AuthSuccess) {
+          if (state is SplashAuthSuccess) {
             if (state.loggedIn) {
-              locator.logger.i(
-                'Kullanıcı giriş yapmış AccountPage yönlendiriliyor',
+              locator.loggerService.i(
+                'Kullanıcı giriş yapmış HomeView yönlendiriliyor',
               );
-              context.goNamed('AccountPage');
+              context.goNamed('HomeView');
             } else {
-              locator.logger.i(
+              locator.loggerService.i(
                 'Kullanıcı giriş yapmamış LoginPage yönlendiriliyor',
               );
-              context.goNamed('LoginPage');
+              context.goNamed('LoginView');
             }
           }
         });

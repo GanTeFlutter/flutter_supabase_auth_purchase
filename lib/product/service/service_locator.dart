@@ -1,5 +1,5 @@
 import 'package:flutter_supabase_google_odeme/product/service/services/logger_service.dart';
-import 'package:flutter_supabase_google_odeme/product/service/services/supabase_table_service.dart';
+import 'package:flutter_supabase_google_odeme/product/service/services/supabase_service.dart';
 import 'package:get_it/get_it.dart';
 
 final GetIt locator = GetIt.instance;
@@ -27,8 +27,8 @@ void _registerLazySingletons() {
 // void _registerFactories() {}
 
 extension ServiceLocator on GetIt {
-  SupabaseService get supabase => locator<SupabaseService>();
-  LoggerService get logger => locator<LoggerService>();
+  SupabaseService get supabaseService => locator<SupabaseService>();
+  LoggerService get loggerService => locator<LoggerService>();
 }
 
 

@@ -3,25 +3,25 @@ import 'package:flutter_supabase_google_odeme/main.dart';
 import 'package:flutter_supabase_google_odeme/product/service/service_locator.dart';
 import 'package:meta/meta.dart';
 
-part 'auth_state.dart';
+part 'splash_auth_state.dart';
 
-class AuthCubit extends Cubit<AuthState> {
-  AuthCubit() : super(AuthInitial());
+class SplashAuthCubit extends Cubit<SplashAuthState> {
+  SplashAuthCubit() : super(SplashAuthInitial());
 
   Future<void> checkAuthStatus() async {
     try {
-      emit(AuthLoading());
+      emit(SplashAuthLoading());
 
       final session = supabase.auth.currentSession;
       final isLoggedIn = session != null;
 
-      emit(AuthSuccess(isLoggedIn));
-      locator.logger.i(
+      emit(SplashAuthSuccess(isLoggedIn));
+      locator.loggerService.i(
         'Auth durumu kontrol edildi: ${isLoggedIn ? "Giriş yapılmış" : "Giriş yapılmamış"}',
       );
     } catch (e) {
-      locator.logger.e('Auth durumu kontrol edilemedi', error: e);
-      emit(AuthError(e.toString()));
+      locator.loggerService.e('Auth durumu kontrol edilemedi', error: e);
+      emit(SplashAuthError(e.toString()));
     }
   }
 }

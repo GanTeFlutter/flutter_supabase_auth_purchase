@@ -5,6 +5,72 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService {
   final SupabaseClient _client = Supabase.instance.client;
 
+  /// ✅ Profil bilgilerini getir
+  Future<Map<String, dynamic>?> getProfile(String userId) async {
+    try {
+      final data = await _client
+          .from('profiles')
+          .select()
+          .eq('id', userId)
+          .maybeSingle();
+
+      if (data == null) {
+        locator.loggerService.w('⚠️ Profil bulunamadı: $userId');
+        return null;
+      }
+
+      locator.loggerService.i('✅ Profil yüklendi: $userId');
+      return data;
+    } on PostgrestException catch (error) {
+      locator.loggerService.e('❌ Supabase hatası: ${error.message}');
+      return null;
+    } catch (e, stack) {
+      locator.loggerService.e(
+        '⚠️ Profil yüklenemedi: $userId',
+        error: e,
+        stackTrace: stack,
+      );
+      return null;
+    }
+  }
+
+  /// ✅ Profil bilgilerini güncelle
+  Future<bool> updateProfile({required Map<String, String> updates}) async {
+    try {
+      await _client.from('profiles').upsert(updates);
+      locator.loggerService.i('✅ Profil güncellendi: ${updates['id']}');
+      return true;
+    } on PostgrestException catch (error) {
+      locator.loggerService.e('❌ Supabase hatası: ${error.message}');
+      return false;
+    } catch (e, stack) {
+      locator.loggerService.e(
+        '⚠️ Profil güncellenemedi: ${updates['id']}',
+        error: e,
+        stackTrace: stack,
+      );
+      return false;
+    }
+  }
+
+  Future<bool> signOut() async {
+    try {
+      await _client.auth.signOut();
+      locator.loggerService.i('✅ Kullanıcı çıkış yaptı.');
+      return true;
+    } on AuthException catch (error) {
+      locator.loggerService.e('❌ Supabase Auth hatası: ${error.message}');
+      return false;
+    } catch (e, stack) {
+      locator.loggerService.e(
+        '⚠️ Çıkış işlemi başarısız.',
+        error: e,
+        stackTrace: stack,
+      );
+      return false;
+    }
+  }
+
   /// ✅ Kullanıcıları getir (opsiyonel filtre ile)
   Future<List<Map<String, dynamic>>> getUsers({bool? isPremium}) async {
     try {
@@ -15,7 +81,7 @@ class SupabaseService {
       final response = await query;
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      locator.logger.e('Kullanıcılar getirilemedi', error: e);
+      locator.loggerService.e('Kullanıcılar getirilemedi', error: e);
       return [];
     }
   }
@@ -30,7 +96,7 @@ class SupabaseService {
           .single();
       return response;
     } catch (e) {
-      locator.logger.e('Kullanıcı getirilemedi: $userId', error: e);
+      locator.loggerService.e('Kullanıcı getirilemedi: $userId', error: e);
       return null;
     }
   }
@@ -50,9 +116,9 @@ class SupabaseService {
             ? DateTime.now().toIso8601String()
             : null,
       });
-      locator.logger.i('Kullanıcı eklendi: $email');
+      locator.loggerService.i('Kullanıcı eklendi: $email');
     } catch (e) {
-      locator.logger.e('Kullanıcı eklenemedi: $email', error: e);
+      locator.loggerService.e('Kullanıcı eklenemedi: $email', error: e);
     }
   }
 
@@ -67,9 +133,9 @@ class SupabaseService {
   Future<void> deleteUser(String userId) async {
     try {
       await _client.from('users').delete().eq('id', userId);
-      locator.logger.i('Kullanıcı silindi: $userId');
+      locator.loggerService.i('Kullanıcı silindi: $userId');
     } catch (e) {
-      locator.logger.e('Kullanıcı silinemedi: $userId', error: e);
+      locator.loggerService.e('Kullanıcı silinemedi: $userId', error: e);
     }
   }
 
@@ -83,7 +149,10 @@ class SupabaseService {
           .single();
       return response['is_premium'] ?? false;
     } catch (e) {
-      locator.logger.e('Premium durumu kontrol edilemedi: $userId', error: e);
+      locator.loggerService.e(
+        'Premium durumu kontrol edilemedi: $userId',
+        error: e,
+      );
       return false;
     }
   }
@@ -98,9 +167,12 @@ class SupabaseService {
             'premium_last_date': DateTime.now().toIso8601String(),
           })
           .eq('id', userId);
-      locator.logger.i('Kullanıcı premium yapıldı: $userId');
+      locator.loggerService.i('Kullanıcı premium yapıldı: $userId');
     } catch (e) {
-      locator.logger.e('Kullanıcı premium yapılamadı: $userId', error: e);
+      locator.loggerService.e(
+        'Kullanıcı premium yapılamadı: $userId',
+        error: e,
+      );
     }
   }
 
@@ -111,9 +183,9 @@ class SupabaseService {
           .from('users')
           .update({'is_premium': false, 'premium_last_date': null})
           .eq('id', userId);
-      locator.logger.i('Premium kaldırıldı: $userId');
+      locator.loggerService.i('Premium kaldırıldı: $userId');
     } catch (e) {
-      locator.logger.e('Premium kaldırılamadı: $userId', error: e);
+      locator.loggerService.e('Premium kaldırılamadı: $userId', error: e);
     }
   }
 
@@ -121,9 +193,9 @@ class SupabaseService {
   Future<void> clearUsers() async {
     try {
       await _client.from('users').delete().neq('id', ''); // tüm satırları siler
-      locator.logger.w('Tüm kullanıcılar silindi!');
+      locator.loggerService.w('Tüm kullanıcılar silindi!');
     } catch (e) {
-      locator.logger.e('Kullanıcılar silinemedi', error: e);
+      locator.loggerService.e('Kullanıcılar silinemedi', error: e);
     }
   }
 

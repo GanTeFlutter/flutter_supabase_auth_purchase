@@ -9,25 +9,27 @@ final GoRouter _router = GoRouter(
       },
     ),
     GoRoute(
-      name: 'LoginPage',
-      path: '/login',
+      name: 'LoginView',
+      path: '/loginview',
       builder: (BuildContext context, GoRouterState state) {
-        return const LoginPage();
-      },
-    ),
-    GoRoute(
-      name: 'AccountPage',
-      path: '/account',
-      builder: (BuildContext context, GoRouterState state) {
-        return const AccountPage();
+        return const LoginView();
       },
     ),
     GoRoute(
       name: 'HomeView',
-      path: '/home',
+      path: '/homeview',
       builder: (BuildContext context, GoRouterState state) {
         return const HomeView();
       },
+      routes: <RouteBase>[
+        GoRoute(
+          name: 'AccountView',
+          path: '/accountview',
+          builder: (BuildContext context, GoRouterState state) {
+            return const AccountView();
+          },
+        ),
+      ],
     ),
   ],
 );

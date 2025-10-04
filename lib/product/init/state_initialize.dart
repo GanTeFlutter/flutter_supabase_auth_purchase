@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_supabase_google_odeme/product/state/cubit/auth_cubit.dart';
+import 'package:flutter_supabase_google_odeme/product/state/cubit/splash_auth_cubit.dart';
 
 ///[StateInitialize] is a widget that initializes the state management
 ///[StateInitialize] bloc ve providerlarımızı burada başlatıyoruz
@@ -11,7 +11,7 @@ class StateInitialize extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => AuthCubit())],
+      providers: [BlocProvider(create: (context) => SplashAuthCubit())],
       child: child,
     );
   }
