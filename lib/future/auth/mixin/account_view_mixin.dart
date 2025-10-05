@@ -12,18 +12,24 @@ mixin AccountMixin<T extends StatefulWidget> on State<T> {
   String userID = '';
 
   Future<void> getUserData() async {
-    setState(() {
-      isLoading = true;
-    });
-    final userId = supabase.auth.currentSession!.user.id;
-    final profile = await locator.supabaseService.getProfile(userId);
-    if (profile != null) {
-      usernameController.text = profile['username'] ?? '';
-      userID = profile['id'] ?? '';
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      final userId = supabase.auth.currentSession!.user.id;
+      final profile = await locator.supabaseService.getProfile(userId);
+      if (profile != null) {
+        usernameController.text = profile['username'] ?? '';
+        userID = profile['id'] ?? '';
+      }
+      setState(() {
+        isLoading = true;
+      });
+    } catch (e) {
+      //Giris yapmamis kullanici icin hata veriyor
+      //route da splash atlarsanız buraya düşersiniz.
+      locator.loggerService.e('Kullanıcı verisi alınamadı: $e');
     }
-    setState(() {
-      isLoading = true;
-    });
   }
 
   Future<void> updateUserData() async {

@@ -5,21 +5,8 @@ final class _HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: const Text('HomeView'),
-      actions: [
-        IconButton(
-          onPressed: () {
-            context.goNamed('AccountView');
-          },
-          icon: Icon(Icons.person_2_outlined),
-        ),
-        IconButton(
-          onPressed: () {
-            context.goNamed('PurchaseView');
-          },
-          icon: Icon(Icons.shopping_cart_outlined),
-        ),
+    return AppBar(title: const Text('HomeView'), actions: [
+      
       ],
     );
   }

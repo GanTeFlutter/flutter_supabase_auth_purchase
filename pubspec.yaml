@@ -3,34 +3,37 @@ description: "A new Flutter project."
 
 publish_to: 'none' 
 
-version: 1.0.2+4
+version: 1.0.7+8
 
 environment:
   sdk: ^3.8.1
 
-
 dependencies:
   flutter:
     sdk: flutter
- 
-  #google in_app_purchase_android: ^3.2.3
+
+  # --- Google Play & Satın Alma ---
   in_app_purchase: ^3.2.3
 
-  #db
+  # --- Database / Backend ---
   supabase_flutter: ^2.10.1
 
-  #state management
+  # --- State Management ---
   flutter_bloc: ^9.1.1
-
-  
   get_it: ^8.2.0
 
+  # --- Utilities & Tools ---
   logger: ^2.6.1
   envied: ^1.3.0
   uuid: ^4.5.1
-  go_router: ^16.2.4
   meta: ^1.16.0
+  package_info_plus: ^9.0.0
 
+  # --- Navigation ---
+  go_router: ^16.2.4
+
+  # --- Network / API ---
+  dio: ^5.9.0
 
 dev_dependencies:
   flutter_test:
