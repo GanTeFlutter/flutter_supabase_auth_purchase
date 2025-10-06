@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_supabase_google_odeme/future/home/mixin/home_view_mixin.dart';
-import 'package:flutter_supabase_google_odeme/product/service/service_locator.dart';
+
 import 'package:go_router/go_router.dart';
 part 'widget/home_appbar.dart';
 
