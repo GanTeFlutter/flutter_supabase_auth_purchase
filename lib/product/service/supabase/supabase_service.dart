@@ -5,6 +5,33 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService {
   final SupabaseClient _client = Supabase.instance.client;
 
+  /// ✅ Token tablosuna veri ekler veya günceller
+  /// ✅ tokenler tablosuna veri ekler (tüm alanlar required)
+  Future<bool> insertToken({
+    required String packageName,
+    required String productId,
+    required String purchaseToken,
+    required String userId,
+  }) async {
+    try {
+      await _client.from('tokenler').insert({
+        'packagename': packageName,
+        'productid': productId,
+        'purchasetoken': purchaseToken,
+        'userid': userId,
+      });
+
+      print('✅ Token başarıyla eklendi!');
+      return true;
+    } on PostgrestException catch (error) {
+      print('❌ Supabase hatası: ${error.message}');
+      return false;
+    } catch (e) {
+      print('⚠️ Beklenmeyen hata: $e');
+      return false;
+    }
+  }
+
   /// ✅ Profil bilgilerini getir
   Future<Map<String, dynamic>?> getProfile(String userId) async {
     try {

@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_supabase_google_odeme/future/purchasing/mixin/purchasing_view_mixin.dart';
+import 'package:flutter_supabase_google_odeme/main.dart';
 import 'package:flutter_supabase_google_odeme/product/extension/show_snackbar.dart';
 import 'package:flutter_supabase_google_odeme/product/service/service_locator.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -15,10 +18,9 @@ class PurchaseView extends StatefulWidget {
 class _PurchaseViewState extends State<PurchaseView> with PurchasingViewMixin {
   final String functionName = 'rapid-function';
   bool isVerifying = false;
-
   Map<String, dynamic> responseData = {};
   Map<String, dynamic> responseData2 = {};
-  // Satın almayı doğrula
+
   Future<void> satinAlimiDogrula(Map<String, String> purchaseData) async {
     setState(() => isVerifying = true);
     try {
@@ -26,18 +28,12 @@ class _PurchaseViewState extends State<PurchaseView> with PurchasingViewMixin {
         functionName: functionName,
         body: purchaseData,
       );
-      locator.loggerService.i('✅ Doğrulama Cevabı: $response');
       responseData = response;
       setState(() {});
-      if (response.containsKey('error')) {
-        throw Exception(response['error']);
-      }
-      // Başarılı doğrulama
       if (mounted) {
         context.showSnackBar('✅ Satın alma doğrulandı!', isError: false);
       }
     } catch (e) {
-      locator.loggerService.e('❌ Doğrulama hatası: $e');
       if (mounted) {
         context.showSnackBar('❌ Doğrulama hatası: $e', isError: true);
       }
@@ -48,7 +44,6 @@ class _PurchaseViewState extends State<PurchaseView> with PurchasingViewMixin {
     }
   }
 
-  // Satın alma güncellemelerini dinle
   @override
   void onPurchaseUpdate(List<PurchaseDetails> purchases) async {
     for (final purchase in purchases) {
@@ -63,13 +58,30 @@ class _PurchaseViewState extends State<PurchaseView> with PurchasingViewMixin {
           'productId': productId,
           'purchaseToken': token,
         };
+        locator.supabaseService
+            .insertToken(
+              userId: supabase.auth.currentUser!.id,
+              packageName: packageName,
+              productId: productId,
+              purchaseToken: token,
+            )
+            .then((success) {
+              if (success) {
+                context.showSnackBar(
+                  '✅ Token veritabanına kaydedildi',
+                  isError: true,
+                );
+              } else {
+                context.showSnackBar(
+                  '❌ Token veritabanına kaydedilemedi',
+                  isError: true,
+                );
+              }
+            });
         responseData2 = purchaseData;
         setState(() {});
-
-        // Doğrulama yap
         await satinAlimiDogrula(purchaseData);
 
-        // ✅ Satın almayı tamamla
         if (purchase.pendingCompletePurchase) {
           await InAppPurchase.instance.completePurchase(purchase);
         }
@@ -91,26 +103,51 @@ class _PurchaseViewState extends State<PurchaseView> with PurchasingViewMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Ürün Satın Al')),
-
       body: Column(
         children: [
-          Container(
-            width: double.infinity,
-            height: 150,
-            color: Colors.transparent,
-            child: Center(
+          // Üst bilgi alanı
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: double.infinity,
+              color: Colors.transparent,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start, // sola hizala
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(responseData.toString()),
-                  Text(responseData2.toString()),
-                  const SizedBox(height: 10),
-                  ElevatedButton(onPressed: () {}, child: Text(functionName)),
+                  // Text widget'ları artık düzgün biçimde alt alta yayılacak
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Text(
+                      'functionName: $functionName',
+                      style: const TextStyle(fontSize: 16),
+                      softWrap: true, // uzun satırlarda otomatik alt satıra geç
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Text(
+                      responseData.toString(),
+                      style: const TextStyle(fontSize: 15),
+                      softWrap: true,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Text(
+                      responseData2.toString(),
+                      style: const TextStyle(fontSize: 15),
+                      softWrap: true,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
 
+          const Divider(thickness: 1),
+
+          // Ürün listesi alanı
           Expanded(
             child: isVerifying
                 ? const Center(child: CircularProgressIndicator())
@@ -119,14 +156,19 @@ class _PurchaseViewState extends State<PurchaseView> with PurchasingViewMixin {
                 : products.isEmpty
                 ? const Center(child: Text('Ürün bulunamadı'))
                 : ListView.builder(
+                    padding: const EdgeInsets.all(8.0),
                     itemCount: products.length,
                     itemBuilder: (context, index) {
                       final product = products[index];
-                      return ListTile(
-                        title: Text(product.title),
-                        subtitle: Text(product.description),
-                        trailing: Text(product.price),
-                        onTap: () => buyProduct(product),
+                      return Card(
+                        elevation: 2,
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        child: ListTile(
+                          title: Text(product.title),
+                          subtitle: Text(product.description),
+                          trailing: Text(product.price),
+                          onTap: () => buyProduct(product),
+                        ),
                       );
                     },
                   ),

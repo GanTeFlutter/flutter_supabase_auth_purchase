@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_supabase_google_odeme/future/home/mixin/home_view_mixin.dart';
+import 'package:flutter_supabase_google_odeme/product/service/service_locator.dart';
 import 'package:go_router/go_router.dart';
 part 'widget/home_appbar.dart';
 
@@ -11,6 +12,18 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with HomeViewMixin {
+  // final Map<String, dynamic> body1 = {'name': 'kadir'};
+  // void istekat() {
+  //   locator.supabaseFunctionService
+  //       .callFunction(functionName: 'rapid-function', body: body1)
+  //       .then((value) {
+  //         setState(() {
+  //           locator.loggerService.i('GelenData: $value');
+  //           dataT = value;
+  //         });
+  //       });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +33,10 @@ class _HomeViewState extends State<HomeView> with HomeViewMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 10,
           children: [
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text('Call Function'),
+            ),
             IconButton(
               onPressed: () {
                 context.goNamed('AccountView');

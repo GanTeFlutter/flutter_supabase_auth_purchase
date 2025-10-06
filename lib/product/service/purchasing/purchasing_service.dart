@@ -19,7 +19,7 @@ class PurchasingService {
       return;
     }
 
-    const Set<String> ids = {'deneme2urun'};
+    const Set<String> ids = {'finaltest'};
     final ProductDetailsResponse response = await _inAppPurchase
         .queryProductDetails(ids);
 
