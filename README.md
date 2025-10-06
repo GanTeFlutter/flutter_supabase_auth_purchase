@@ -1,103 +1,174 @@
+# Flutter — In‑App Purchase (Google Play) + Supabase Edge Function ile Doğrulama
 
-Flutter supabase in_app_purchase ile satın alma aut ve bu satın almayı supabase function üzerinden doğrulama yaptığım bir proje
+> Bu repo, **Google Play (in_app_purchase)** ile yapılan uygulama içi satın alımlarının **Supabase Edge Function** kullanılarak güvenli şekilde doğrulanmasını anlatır ve örnek kod/ayarlar içerir.
 
-Bu projeyi çalıştırabilmek için öncelikle Play Console bir proje yüklemelisiniz bunun için bazı kaynaklar.
-https://codelabs.developers.google.com/codelabs/flutter-in-app-purchases?hl=tr#0
+---
 
-uygulamayı imzlamak için Android studio ile direk yapabilirsiniz!
-https://docs.flutter.dev/deployment/android
+## Öne Çıkanlar
 
-!Alınması gereken izinler!
+* Google Play üzerinden satın alma işlemi (`in_app_purchase` paketi) ile entegrasyon.
+* Satın alma token'ının Sunucu tarafında **Supabase Edge Function** aracılığıyla Google Play Developer API ile doğrulanması.
+* Google Cloud Service Account JSON anahtarının Supabase'e **secret** olarak yüklenmesi.
+* Adım adım Play Console, Google Cloud ve Supabase yapılandırma rehberi.
 
- Google Cloud 
-  Öncelikle playconsolda bir kapalı veya açık test başlatın sonrasında bu projeyi CloudConsole dan seçtin 
+---
 
-  soldaki menüden Service Accounts > Create service account>(Permissions kısmında Select a role kısmından Service Accounts> Service Account Token Creator) secin  devam edin aktif edilmiş olarak mail orada gözükecek 
+## İçindekiler
 
-  bu mailinen sağında ki üç nokta>Manage Keys>Add key>Create new key>Json>Create diyerek Json dosyasini indirin 
-  (bu supabase tarafında play consola istek atarken bak ben buyum sana istek atıyorum demek için bir nevi kendimi tanıtmak için kullanılacak.)
-  
-  ardından Tekrar ana sayfaya gelerek  APIs & Services >API Library den Google Play Android Developer API aktif edin
-  
-  Google Cloud tarafında işlemler bu kadar 
+* [Gereksinimler](#gerek-kenimler)
+* [Play Console — Hızlı Ayarlar](#play-console--h%C4%B1zl%C4%B1-ayarlar)
+* [Google Cloud — Service Account Oluşturma](#google-cloud--service-account-olu%C5%9Fturma)
+* [Supabase — Edge Function & Secret Ayarları](#supabase--edge-function--secret-ayarlari)
+* [Kullanılan Paketler](#kullan%C4%B1lan-paketler)
+* [Örnek Fonksiyon Çağrısı & API Endpoint](#%C3%B6rnek-fonksiyon-%C3%A7a%C4%9Fr%C4%B1s%C4%B1--api-endpoint)
+* [Uygulamayı İmzalama & Yayına Hazırlama](#uygulamayi-izmalama--yayina-hazirlama)
+* [Test Etme / Kapalı Test Kullanıcıları](#test-etme--kapali-test-kullanicilari)
+* [Notlar & İletişim](#notlar--iletisim)
 
+---
 
+## Gereksinimler
 
-Play Console Tarafı
-Ana sayfa  >Kullanıcı Ve izinler>  Uygulamayı seçip izinleri yönet >
+* Flutter ortamı (stable channel)
+* Android Studio (uygulamayı imzalamak için önerilir)
+* Play Console hesabı
+* Google Cloud projesi (Play Console ile aynı proje tercih edilir)
+* Supabase hesabı ve proje
 
-Finansal veri	Finansal verileri görüntüleme >iznini aktif edin 
+---
 
+## Play Console — Hızlı Ayarlar
 
+1. Play Console'da **kapalı** veya **açık test** başlatın.
+2. **Kullanıcı ve izinler** bölümünden uygulama için gerekli yetkileri verin:
 
-🔹 Supabase Tarafı
+   * **Finansal veri**: `Finansal verileri görüntüleme` iznini aktif edin.
 
-Login/Auth kısmı en altta bununan supabase doc linki ile aynı o yüzden ordan tüm işlemleri tamamlayın giriş işlemi tamamlanması lazım çünkü sopabaseFunctiona giriş yapmış kullanıcın id sini gönderiyoruz bunulada premium durumunu ture çekiyoruz tabi ki play console tarafındak doğrulama gelirse...
+> Play Console tarafındaki satın alma verisine erişim için doğru izinler şarttır.
 
-Edge Function oluşturma:
-Satın alma doğrulaması için Supabase üzerinde bir Edge Function oluşturulur.
-Bu fonksiyon, Google Play API’ye güvenli şekilde istek atmak için kullanılır.
+---
 
-Service Account JSON Key ekleme:
-Google Cloud’dan alınan .json key, Supabase Dashboard → Edge Functions → Configuration → Add new secret kısmına eklenir:
+## Google Cloud — Service Account Oluşturma
 
-Key: GOOGLE_SERVICE_ACCOUNT
-Value: (JSON dosyasının tüm içeriği) Bunu almıştık 
-eğer bu şekilde çalıştırırken  hata alıyorsanız direkt functionun içinde kullanın ama doğrusu yukarıda yazan 
+1. `Google Cloud Console` → **IAM & Admin** → **Service Accounts** → **Create service account**
+2. Permissions kısmında **Service Accounts > Service Account Token Creator** rolünü seçin.
+3. Oluşturduktan sonra ilgili Service Account satırında üç nokta → **Manage keys** → **Add key** → **Create new key** → **JSON** indirin.
+4. `APIs & Services` → **API Library** üzerinden **Google Play Android Developer API**'yi aktif edin.
 
+> Bu JSON dosyası, Supabase fonksiyonunun Google Play API'ye kimlik doğrulamalı istek atması için kullanılacak.
 
+---
 
-Eğer yapan olursa mesaj atsın profilimde instagram linki var yardımcı olrum <3
+## Supabase — Edge Function & Secret Ayarları
 
+1. Supabase Dashboard → **Edge Functions** → Yeni fonksiyon oluşturun (ör: `verify_purchase`).
+2. Fonksiyon içinde Google Play API çağrısını yapacak kodu yazın (örn. Node.js/TypeScript veya Deno).
+3. Dashboard → Edge Functions → **Configuration** → **Add new secret** ekleyin:
 
+   * **Key:** `GOOGLE_SERVICE_ACCOUNT`
+   * **Value:** (Google Cloud'dan indirdiğiniz JSON içeriğinin tamamı)
 
+> Eğer secret olarak eklerken hata alıyorsanız, geçici çözüm olarak JSON içeriğini doğrudan fonksiyon içinde kullanabilirsiniz. (Güvenlik açısından tavsiye edilmez.)
 
-supabase Kullanıcı Giriş kısmının Kurulum Dosyası Alltaki tutorials ile benim kodlarım aynıdır belki bi service yapmışımdır o kadar.
-https://supabase.com/docs/guides/getting-started/tutorials/with-flutter?queryGroups=platform&platform=android&queryGroups=database-method&database-method=dashboard
+### Fonksiyonun Yapacağı İşler (özet)
 
+* İstemciden gelen: `userId`, `packageName`, `productId`, `purchaseToken`.
+* Fonksiyon, Google Play API endpoint'ine istek atar:
 
-Bir uygulama içi öğenin satın alma ve tüketim durumunu kontrol eder.
-yani supabaseFuntion tarafında play consoldan doğrulama yaparken alltaki kodu göndereceğiz(içini doldurup)
-https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.products/get?hl=tr
-https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}
+  ```
+  GET https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}
+  ```
+* Google Play doğrulaması başarılıysa Supabase veritabanında ilgili kullanıcının `premium` veya satın alma bilgisini günceller.
 
+> Google dökümantasyonu: `purchases.products.get`. (Bu URL kullanılır.)
 
+---
 
+## Örnek Edge Function (kısa şablon — Deno/TypeScript)
 
+```ts
+// örnek: verify_purchase/index.ts
+import { serve } from "std/server";
+import { google } from "googleapis"; // Deno'da farklı olabilir
 
-📦 Kullanılan Paketler
-💰 Satın Alma
+serve(async (req) => {
+  const body = await req.json();
+  const { packageName, productId, token, userId } = body;
 
-in_app_purchase → Google Play üzerinden uygulama içi ürün ve abonelik işlemleri.
+  // GOOGLE_SERVICE_ACCOUNT secret'ını kullanarak JWT/credentials oluşturun
+  // google.auth.JWT veya uygun auth flow ile Play Developer API'ye istek atın
 
-🗄️ Backend
+  // Endpoint:
+  // https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/purchases/products/${productId}/tokens/${token}
 
-supabase_flutter → Kullanıcı, veritabanı ve edge function yönetimi.
+  // Dönen sonucu kontrol edip Supabase veritabanını güncelleyin
 
-🧠 State Management
+  return new Response(JSON.stringify({ ok: true }), { status: 200 });
+});
+```
 
-flutter_bloc → Uygulama durum yönetimi (BLoC yapısı).
+> Not: Üstteki kod Deno/Node farkı ve kütüphane kullanımına göre uyarlanmalıdır. Resmi Google API client kitaplıkları tercih edin.
 
-get_it → Servis locator (bağımlılık yönetimi).
+---
 
-🧰 Araçlar
+## Kullanılan Paketler (Flutter tarafı)
 
-logger → Loglama ve hata ayıklama.
+```
+in_app_purchase
+supabase_flutter
+flutter_bloc
+get_it
+logger
+envied
+uuid
+meta
+package_info_plus
+go_router
+dio
+build_runner
+```
 
-envied / envied_generator → Ortam değişkenleri (.env) yönetimi.
+---
 
-uuid → Benzersiz kimlik üretimi.
+## Uygulamayı İmzalama & Yayına Hazırlama
 
-meta → Kod açıklama anotasyonları.
+* Uygulamayı Android Studio veya `flutter build appbundle --release` ile imzalayıp .aab oluşturun.
+* Flutter resmi deployment rehberi: [https://docs.flutter.dev/deployment/android](https://docs.flutter.dev/deployment/android)
 
-package_info_plus → Uygulama sürüm bilgileri.
+---
 
-🧭 Navigasyon
+## Test Etme / Kapalı Test Kullanıcıları Veya Dahili Testte Olur
 
-go_router → Sayfa yönlendirme ve route yönetimi.
+* Play Console'da test hesabı ekleyin.
+* Cihazınızda test hesabıyla Play Store'dan uygulamanın test sürümünü yükleyin.
+* Satın alma işlemlerini test kullanıcılarıyla deneyin.
 
-🌐 Ağ / API
+---
 
-dio → HTTP istekleri ve API entegrasyonu.
+## Faydalı Kaynaklar
 
-build_runner → Kod üretimi araçları (envied vb.).
+* Google Codelab (Flutter in-app purchases):
+  [https://codelabs.developers.google.com/codelabs/flutter-in-app-purchases?hl=tr#0](https://codelabs.developers.google.com/codelabs/flutter-in-app-purchases?hl=tr#0)
+* Supabase Flutter Tutorial:
+  [https://supabase.com/docs/guides/getting-started/tutorials/with-flutter?queryGroups=platform&platform=android&queryGroups=database-method&database-method=dashboard](https://supabase.com/docs/guides/getting-started/tutorials/with-flutter?queryGroups=platform&platform=android&queryGroups=database-method&database-method=dashboard)
+* Google Play Purchases API reference:
+  [https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.products/get?hl=tr](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.products/get?hl=tr)
+
+---
+
+## Kurulum Kontrol Listesi (Checklist)
+
+* [ ] Play Console test veya üretim ortamı oluşturuldu
+* [ ] Google Cloud Service Account oluşturuldu ve JSON indirildi
+* [ ] Google Play Android Developer API etkinleştirildi
+* [ ] Service Account JSON Supabase'e `GOOGLE_SERVICE_ACCOUNT` secret olarak eklendi
+* [ ] Supabase Edge Function yazıldı ve deploy edildi
+* [ ] Flutter uygulamasında `in_app_purchase` ile satın alma akışı entegre edildi
+* [ ] Satın alma token'ı Supabase fonksiyonuna gönderiliyor ve doğrulanıyor
+
+---
+
+## Notlar & İletişim
+
+Eğer bu rehberi uygularken takılırsanız profilimdeki Instagram üzerinden mesaj atabilirsiniz — yardımcı olurum ❤️
+
